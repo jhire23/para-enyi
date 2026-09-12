@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Carta Virtual</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght=500;700&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #FFD3D5 0%, #c3cfe2 100%);
+      font-family: 'Quicksand', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    .carta-wrapper {
+      width: min(400px, 92vw);
+      height: min(480px, 70vh);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .hoja-papel {
+      background-color: #ffffff;
+      background-image: linear-gradient(#e8effa 1px, transparent 1px);
+      background-size: 100% 2rem;
+      
+      width: 100%;
+      height: 100%;
+      padding: 40px 30px;
+      box-sizing: border-box;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(163, 177, 198, 0.4), 0 1px 8px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      position: relative;
+      overflow-y: auto;
+      
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .hoja-papel.cambiando {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+
+    .contador-paginas {
+      align-self: flex-end;
+      font-size: 0.8rem;
+      color: #9eabb8;
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .texto-carta {
+      font-size: 1rem;
+      color: #3a4750;
+      line-height: 2rem;
+      margin: 0;
+      white-space: pre-line; 
+      width: 100%;
+    }
+    .button-area {
+      margin-top: 25px;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      align-items: center;
+      width: min(400px, 92vw);
+    }
+
+    .btn-carta {
+      background: linear-gradient(135deg, #ffffff 0%, #f1f3f6 100%);
+      color: #6c7a89;
+      border: 1px solid #d1d8e0;
+      padding: 10px 24px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(163, 177, 198, 0.2);
+      transition: all 0.2s ease;
+    }
+    #btn-siguiente {
+      background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 4px 12px rgba(63, 43, 150, 0.25);
+    }
+
+    #btn-siguiente:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(63, 43, 150, 0.35);
+    }
+
+    .btn-carta:hover {
+      background: #ffffff;
+      color: #3a4750;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(163, 177, 198, 0.3);
+    }
+
+    .btn-carta:active {
+      transform: translateY(1px);
+    }
+
+    .btn-carta:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="carta-wrapper">
+    <div class="hoja-papel" id="hoja">
+      <div class="contador-paginas" id="contador">Pág. 1 de 4</div>
+      <p class="texto-carta" id="contenido-texto">Cargando...</p>
+    </div>
+  </div>
+
+  <div class="button-area">
+    <button class="btn-carta" id="btn-atras" onclick="anteriorPagina()">Atrás</button>
+    <button class="btn-carta" id="btn-siguiente" onclick="pasarPagina()">Siguiente</button>
+  </div>
+
+  <script>
+    const paginasTexto = [
+      "Estimada Enyiel:\n\n\nNo se a que hora veras esto, asi que buenos dias buenas tardes o buenas noches.",
+      "Estuve pensando en lo que siento.\nHubo momentos en donde quise creer que este sentimiento se iria sabes, pero no fue asi, cada vez sentia mas por ti jajaja.\nY bueno, se que no es mutuo y que quizas deba dejar eso a un lado simplemente.\n\nComo te dije hace tiempo, estoy contento de haberlo intentado al menos, las cosas no sucedieron como quise.",
+      "Aunque si hubieramos seguido como antes quizas si hubieras llegado a sentir algo por mi, no lo se.\nQuizas en otras circunstancias hubiera sido de otra manera, quizas te agobié mucho de tanta atención e importancia que te di no se jajaj.\n\nLa esperanza que tuve desde que me dijiste que intente enamorarte aun esta, pero.. ya deberia dejar todo eso atras, cierto?",
+      "No es que me sienta mal, al contrario, estoy feliz de haberlo intentado, solo que tengo mucho cariño por darte que aveces no se que hacer con tanto.\n\nPero a pesar de todo, quiero seguir siendo lo cariñoso que fui contigo, porque me gusta demostrarte lo que siento.\nPero por alguna razon siento que te molesta eso, aunque ya lo hablamos.",
+      "Tu de verdad en ningun momento has llegado a decirte a ti misma, o pensar en que quizas si sientas algo por mi o tan si quiera verme no solo como amigo?\nPorque la manera en cómo aceptabas los detalles que te hacia, la manera en como a veces me hablabas, el interes que pusiste por mi, el tiempo que te dabas para mi, o hasta el emote del corazón del free.\nTodo eso me hizo pensar que poco a poco estabas empezando a sentir algo.",
+      "Me pregunto que pensarás tu de mi, o qué concepto tendrás, que pensarás de lo que siento por ti.\n\nDeberia dejar esto atras? Aunque lo deje o no, mi vida no depende de eso.\nPero la esperanza de que algo pueda pasar entre nosotros aun esta jajaja.\n\nPero en fin.",
+      "Estos meses me han servido para saber que lo que hice valio mucho la pena, porque aunque no salio como esperaba, me hizo conocerte un poco mejor, saber mas de ti.\n\nConoci mas cosas que te gustan, cosas que te disgustan. Supe mas de como es tu comportamiento, como reaccionas a ciertas situaciones.\nConoci lo feliz que te hace tus estudios aunque a veces te estresa jajaja",
+      "Y aunque aun no conozco mucho de ti, se que eres una persona hermosa, por dentro y por fuera.\n\nYa lo dije muchas veces pero me llamo mucho la atencion tu forma de ser y por eso mis sentimientos hacia ti.",
+      "Solo me queda decir gracias por darme la oportunidad.\n Y sinceramente, si me das una pequeña señal de que quizas pueda haber algo, te juro por mi vida que enserio hago lo que sea, pero si no, dejar todo a un lado y simplemente seguir con la amistad, porque enserio valoro mucho tu amistad, eres muy especial para mi",
+      "Quiero que sepas que mis sentimientos por ti son sinceros, que haría cualquier cosa por ti.\n\nQue sepas que me gusta que me gustes jajaja",
+      "Y bueno eso… le mando un abrazo señorita.\n\nEspero que le este yendo bien en todo, recuerde alimentarse bien y cuidarse que no quiero que se me ponga mal\n\n\n              Jhire"
+    ];
+
+    let indiceActual = 0;
+    const hojaElemento = document.getElementById('hoja');
+    const textoElemento = document.getElementById('contenido-texto');
+    const contadorElemento = document.getElementById('contador');
+    const btnAtras = document.getElementById('btn-atras');
+    const btnSiguiente = document.getElementById('btn-siguiente');
+
+    actualizarPantalla();
+
+    function actualizarPantalla() {
+      textoElemento.innerText = paginasTexto[indiceActual];
+      contadorElemento.innerText = `Pág. ${indiceActual + 1} de ${paginasTexto.length}`;
+
+      btnAtras.disabled = (indiceActual === 0);
+
+      if (indiceActual === paginasTexto.length - 1) {
+        btnSiguiente.innerText = "Fin";
+      } else {
+        btnSiguiente.innerText = "Siguiente";
+      }
+    }
+
+    function pasarPagina() {
+      if (indiceActual >= paginasTexto.length - 1) {
+        return;
+      }
+
+      hojaElemento.classList.add('cambiando');
+
+      setTimeout(() => {
+        indiceActual++;
+        actualizarPantalla();
+        hojaElemento.classList.remove('cambiando');
+      }, 300);
+    }
+
+    function anteriorPagina() {
+      if (indiceActual <= 0) return;
+
+      hojaElemento.classList.add('cambiando');
+
+      setTimeout(() => {
+        indiceActual--;
+        actualizarPantalla();
+        hojaElemento.classList.remove('cambiando');
+      }, 300);
+    }
+  </script>
+
+</body>
+</html>
