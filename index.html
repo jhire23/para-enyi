@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Consultorio de la Dra. Enyiel</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght=500;700&display=swap');
+
+    :root {
+      --color-pared: #fbf7f0;
+      --color-zoqualo: #d2ded4;
+      --color-piso: #eaddcd;
+      --color-madera: #8b5a2b;
+      --color-madera-oscura: #6f441f;
+      --color-texto: #000000;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background-color: var(--color-pared);
+      font-family: 'Quicksand', sans-serif;
+      color: var(--color-texto);
+      overflow: hidden;
+      perspective: 1200px;
+    }
+
+    .oculto {
+      display: none !important;
+    }
+
+    .hospital-corridor {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+      transition: opacity 0.8s ease-in, transform 0.8s ease-in;
+      transform: scale(1) translateZ(0);
+    }
+
+    .hospital-corridor.zoom-in {
+      opacity: 0;
+      transform: scale(2.8) translateZ(300px); 
+      pointer-events: none;
+    }
+
+    .hospital-corridor::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 25vh;
+      background-color: var(--color-piso);
+      border-top: 15px solid var(--color-zoqualo);
+      z-index: 1;
+    }
+
+    .door-frame {
+      position: absolute;
+      bottom: 27vh; 
+      left: 50%;
+      transform: translateX(-50%);
+      width: 270px;
+      height: 420px;
+      background-color: #e3fafc;
+      border: 8px solid var(--color-madera-oscura);
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      box-shadow: inset 0 10px 25px rgba(0,0,0,0.2), 0 8px 16px rgba(0,0,0,0.08);
+      z-index: 10;
+      perspective: 1000px;
+    }
+
+    .hanging-sign {
+      position: absolute;
+      top: 15%;
+      left: 51.25%;
+      transform: translateX(-50%);
+      transform-origin: top center;
+      background-color: #ffffff;
+      border: 4px solid var(--color-madera);
+      border-radius: 8px;
+      padding: 10px 24px;
+      text-align: center;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      z-index: 20;
+      white-space: nowrap; 
+    }
+
+    .hanging-sign h1 {
+      font-family: 'Fredoka One';
+      margin: 0 0 2px 0;
+      font-size: 1.6rem;
+      color: #3b82f6;
+    }
+
+    .hanging-sign p {
+      margin: 0;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #ec4899;
+    }
+
+    .door {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--color-madera);
+      border-radius: 2px 2px 0 0;
+      cursor: pointer;
+      transform-origin: left center;
+      transform-style: preserve-3d;
+      transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 15px;
+      box-sizing: border-box;
+      z-index: 12;
+    }
+
+    .door::before {
+      content: '';
+      position: absolute;
+      top: 8%;
+      left: 10%;
+      width: 80%;
+      height: 40%;
+      border: 4px solid var(--color-madera-oscura);
+      border-radius: 4px;
+    }
+
+    .door::after {
+      content: '';
+      position: absolute;
+      bottom: 8%;
+      left: 10%;
+      width: 80%;
+      height: 40%;
+      border: 4px solid var(--color-madera-oscura);
+      border-radius: 4px;
+    }
+
+    .knob {
+      width: 16px;
+      height: 16px;
+      background: radial-gradient(circle at 30% 30%, #ffd700, #b8860b);
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      z-index: 15;
+    }
+
+    .door.open {
+      transform: rotateY(-110deg);
+    }
+
+    .consultorio-inside {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #f0fdf4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4vh 20px;
+      box-sizing: border-box;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+      z-index: 1;
+    }
+
+    .consultorio-inside.visible {
+      opacity: 1;
+      transform: scale(1);
+      z-index: 30;
+    }
+
+    .board-area {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .cork-board {
+      background-color: #ffd3de;
+      border: 6px solid #FF859B;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 480px;
+      padding: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+
+    .board-title {
+      font-family: 'Fredoka One';
+      text-align: center;
+      font-size: 1.1rem;
+      color: #ffffff;
+      background-color: #a0744a;
+      padding: 4px 12px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .sheets-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      justify-items: center;
+    }
+
+    .pending-sheet {
+      background-color: #ffffff;
+      width: 100px;
+      height: 80px;
+      padding: 8px;
+      box-sizing: border-box;
+      border-radius: 2px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.06);
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .pending-sheet:hover {
+      transform: scale(1.05) !important;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+    }
+
+    .pending-sheet.completado {
+      background-color: #d1fae5;
+      opacity: 0.8;
+      border: 2px dashed #34d399;
+    }
+    
+    .pending-sheet.completado .sheet-title {
+      text-decoration: line-through;
+      color: #059669;
+    }
+
+    .thumbtack {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.1rem;
+      z-index: 5;
+    }
+
+    .sheet-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #555;
+      text-align: center;
+    }
+
+    .pending-sheet:nth-child(1) { transform: rotate(-3deg); }
+    .pending-sheet:nth-child(2) { transform: rotate(2deg); }
+    .pending-sheet:nth-child(3) { transform: rotate(-1deg); }
+    .pending-sheet:nth-child(4) { transform: rotate(3deg); }
+    .pending-sheet:nth-child(5) { transform: rotate(-2deg); }
+    .pending-sheet:nth-child(6) { transform: rotate(1deg); }
+
+    .doctor-area {
+      top: -160px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      position: relative;
+    }
+
+    .speech-bubble {
+      top: -20px;
+      background-color: #ffffff;
+      border: 3px solid #3b82f6;
+      border-radius: 16px;
+      padding: 10px 18px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #000000;
+      text-align: center;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.06);
+      max-width: 220px;
+      z-index: 10;
+      margin-bottom: 35px; 
+      border-color: #ec4899;
+      position: relative;
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 15px 10px 0;
+      border-style: solid;
+      border-color: #ffffff transparent;
+      display: block;
+      width: 0;
+    }
+    
+    .speech-bubble::before {
+      content: '';
+      position: absolute;
+      bottom: -19px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 16px 11px 0;
+      border-style: solid;
+      border-color: #ec4899 transparent;
+      display: block;
+      width: 0;
+    }
+
+    .desk-scene {
+      position: relative;
+      width: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .office-desk {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .desk-text {
+      font-family: 'Fredoka One';
+      font-size: 1rem;
+      color: #ffffff;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+      letter-spacing: 1px;
+    }
+
+    .pediatra-avatar {
+      width: 90px;
+      height: 110px;
+      transform: scale(1.5); 
+      transform-origin: bottom center;
+      position: relative;
+      margin-bottom: -5px; 
+      z-index: 2;
+    }
+
+    .hair-back {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 74px;
+      height: 100px;
+      background-color: #1a110b; 
+      border-radius: 35px 35px 15px 15px;
+    }
+
+    .face {
+      position: absolute;
+      top: 0px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 52px;
+      background-color: #fcebe0; 
+      border-radius: 50% 50% 45% 45%;
+      z-index: 3;
+    }
+
+    .face::before, .face::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background-color: #333;
+      border-radius: 50%;
+      top: 22px;
+    }
+    .face::before { left: 12px; }
+    .face::after { right: 12px; }
+
+    .smile {
+      position: absolute;
+      top: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 7px;
+      border-bottom: 3px solid #b85d5d;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .hair-front {
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 54px;
+      height: 20px;
+      background-color: #2b1d14; 
+      border-radius: 20px 20px 5px 5px;
+      z-index: 4;
+    }
+
+    .neck {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 20px;
+      background-color: #fcebe0; 
+      border-radius: 20px 20px 0 0;
+      z-index: 2;
+    }
+
+    .body-doctor {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 76px;
+      height: 50px;
+      background-color: #ffffff; 
+      border-radius: 20px 20px 0 0;
+      border: 2px solid #e2e8f0;
+      overflow: hidden;
+    }
+
+    .medical-shirt {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 16px;
+      background-color: #a5f3fc; 
+      border-radius: 20px 0 12px 12px;
+    }
+
+    .lapels {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 25px;
+      background-color: transparent;
+    }
+
+    .lapels::before, .lapels::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+    .lapels::before { left: 0; border-width: 20px 12px 0 0; border-color: #ffffff transparent transparent transparent; }
+    .lapels::after { right: 0; border-width: 20px 0 0 12px; border-color: #ffffff transparent transparent transparent; }
+
+    .stethoscope {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 38px;
+      height: 28px;
+      border: 3px solid #64748b; 
+      border-top: none;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .office-desk {
+      width: 100%;
+      height: 55px;
+      background-color: #FFAFB3;
+      border: 4px solid #FF859B;
+      border-radius: 6px 6px 0 0;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+      z-index: 3;
+    }
+
+    .camilla-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #f0fdf4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-start;
+      padding: 4vh 20px;
+      box-sizing: border-box;
+      z-index: 1;
+    }
+
+    .patient-header {
+      background-color: #ff8fa1;
+      color: white;
+      padding: 8px 24px;
+      border-radius: 30px;
+      font-family: 'Fredoka One';
+      box-shadow: 0 4px 10px rgba(59,130,246,0.25);
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .treatment-box {
+      background-color: #ffd3de;
+      width: 100%;
+      max-width: 440px;
+      border: 4px solid #ffb7d4;
+      border-radius: 16px;
+      padding: 15px;
+      box-sizing: border-box;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+      margin-bottom: 2vh;
+      position: relative;
+      top: -3pc;
+    }
+
+    .treatment-title {
+      font-family: 'Fredoka One';
+      text-align: center;
+      color: #1e3a8a;
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .botiquin-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .btn-medicina {
+      background-color: #fbf7f0;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 12px 6px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--color-texto);
+      cursor: pointer;
+      transition: transform 0.1s, background-color 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-medicina span {
+      font-size: 1.5rem;
+    }
+
+    .btn-medicina:active {
+      transform: scale(0.95);
+    }
+    #burbuja-paciente::before {
+      border-color: #ec4899 transparent transparent transparent !important;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    .shake-animation {
+      animation: shake 0.3s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hospital-corridor" id="pasillo">
+    <div class="door-frame">
+      <div class="door" id="puerta" onclick="abrirConsultorio()">
+        <div class="knob"></div>
+        <div class="hanging-sign">
+          <h1>Dra. Enyiel</h1>
+          <p>Pediatría</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="consultorio-inside oculto" id="consultorio">
+    
+    <div class="board-area">
+      <div class="cork-board">
+        <div class="board-title">Pendientes</div>
+        
+        <div class="sheets-grid">
+          <div class="pending-sheet" id="hoja-1" onclick="verPendiente(1)">
+            <div class="thumbtack">📌</div>
+            <div class="sheet-title">Historial #01</div>
+          </div>
+          <div class="pending-sheet" id="hoja-2" onclick="verPendiente(2)">
+            <div class="thumbtack">📌</div>
+            <div class="sheet-title">Historial #02</div>
+          </div>
+          <div class="pending-sheet" id="hoja-3" onclick="verPendiente(3)">
+            <div class="thumbtack">📌</div>
+            <div class="sheet-title">Historial #03</div>
+          </div>
+          <div class="pending-sheet" id="hoja-4" onclick="verPendiente(4)">
+            <div class="thumbtack">📌</div>
+            <div class="sheet-title">Historial #04</div>
+          </div>
+          <div class="pending-sheet" id="hoja-5" onclick="verPendiente(5)">
+            <div class="thumbtack">📌</div>
+            <div class="sheet-title">Historial #05</div>
+          </div>
+          <div class="pending-sheet" id="hoja-6" onclick="verPendiente(6)">
+            <div class="thumbtack">📌</div>
+            <div class="sheet-title">Historial #06</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="doctor-area">
+      <div class="speech-bubble" id="burbuja-dra">¿Qué pendiente tenemos hoy?</div>
+      
+      <div class="desk-scene">
+        <div class="pediatra-avatar">
+          <div class="hair-back"></div>
+          <div class="face">
+            <div class="smile"></div>
+          </div>
+          <div class="hair-front"></div>
+          <div class="neck"></div>
+          <div class="body-doctor">
+            <div class="medical-shirt"></div>
+            <div class="lapels"></div>
+            <div class="stethoscope"></div>
+          </div>
+        </div>
+        
+        <div class="office-desk">
+          <div class="desk-text">Dra. Enyiel - Pediatra</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="modal-expediente" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;">
+    <div style="background-color: #ffffff; width: 85%; max-width: 340px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 4px solid #ffffff; position: relative;">
+      
+      <div style="text-align: center; border-bottom: 2px dashed #3b82f6; padding-bottom: 8px; margin-bottom: 15px;">
+        <h3 style="font-family: 'Fredoka One'; margin: 0; color: #1e3a8a; font-size: 1.2rem; letter-spacing: 0.5px;">HISTORIAL CLÍNICO</h3>
+        <span style="font-size: 0.75rem; color: #ec4899; font-weight: 700; letter-spacing: 1px;">DRA. ENYIEL - PEDIATRA</span>
+      </div>
+
+      <div style="font-size: 0.9rem; color: #4a3b32; line-height: 1.5;">
+        <p style="margin: 6px 0;"><strong>Paciente:</strong> <span id="exp-nombre"></span></p>
+        <p style="margin: 6px 0;"><strong>Edad:</strong> <span id="exp-edad"></span></p>
+        <p style="margin: 6px 0;"><strong>Control:</strong> <span id="exp-medidas"></span></p>
+        <p style="margin: 6px 0;"><strong>Motivo:</strong> <span id="exp-motivo"></span></p>
+        
+        <div style="background-color: #f0fdf4; padding: 10px; border-radius: 6px; margin-top: 15px; border-left: 4px solid #22c55e;">
+          <strong style="color: #166534;">Diagnóstico de la Doctora:</strong>
+          <p id="exp-diag" style="margin: 5px 0 0 0; font-style: italic; color: #334155;"></p>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 22px;">
+        <button onclick="cerrarExpediente()" style="flex: 1; padding: 11px; background-color: #ef4444; color: white; border: none; border-radius: 8px; font-weight: bold; font-family: 'Quicksand'; font-size: 0.9rem; cursor: pointer; transition: background-color 0.2s;">Cerrar</button>
+        <button onclick="irACamilla()" style="flex: 1; padding: 11px; background-color: #22c55e; color: white; border: none; border-radius: 8px; font-weight: bold; font-family: 'Quicksand'; font-size: 0.9rem; cursor: pointer; transition: background-color 0.2s;">Atender</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="camilla-screen oculto" id="pantalla-camilla">
+    
+    <div class="patient-header" id="camilla-paciente-nombre">Atendiendo Paciente</div>
+
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; margin-top: -20px;">
+      <div class="speech-bubble" id="burbuja-paciente" style="border-color: #ec4899; color: #9d174d; margin-bottom: 25px;">¡Hola Dra!</div>
+      
+      <div id="emoji-paciente" style="font-size: 5.5rem; transition: transform 0.2s; margin-top: -30px">👶</div>
+    </div>
+
+    <div class="treatment-box" id="boxel">
+      <div class="treatment-title" id="instruccion-botiquin">Selecciona el tratamiento correcto</div>
+      
+      <div class="botiquin-grid" id="contenedor-botones">
+        <button class="btn-medicina" onclick="aplicarTratamiento('Crema Humectante')">
+          <span>🧴</span>Crema Humectante
+        </button>
+        <button class="btn-medicina" onclick="aplicarTratamiento('Jarabe para la Fiebre')">
+          <span>🧪</span>Jarabe Fiebre
+        </button>
+        <button class="btn-medicina" onclick="aplicarTratamiento('Colocar Vacunas')">
+          <span>💉</span>Colocar Vacunas
+        </button>
+        <button class="btn-medicina" onclick="aplicarTratamiento('Mordedor Frío')">
+          <span>🧸</span>Mordedor Frío
+        </button>
+        <button class="btn-medicina" onclick="aplicarTratamiento('Gotas para la Panza')">
+          <span>💧</span>Gotas Panza
+        </button>
+        <button class="btn-medicina" onclick="aplicarTratamiento('Jarabe para la Tos')">
+          <span>🍯</span>Jarabe Tos
+        </button>
+      </div>
+
+    </div>
+      <button id="btn-regresar-pizarra" class="oculto" onclick="regresarAPizarra()" style="width: 100%; padding: 12px; background-color: #ff8fa1; color: white; border: none; border-radius: 8px; font-family: 'Fredoka One'; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(59,130,246,0.2); position: relative; top: -200px">
+        Volver a Pendientes
+      </button>
+  </div>
+
+  <script>
+    let pacienteActualID = null;
+
+    const datosPacientes = {
+      1: {
+        nombre: "Liam Carter", emoji: "👶",
+        edad: "14 meses", medidas: "Peso: 10.5 kg | Talla: 78 cm",
+        motivo: "Le corresponde su control regular de inmunización infantil.",
+        diag: "Crecimiento óptimo. Se autoriza colocar sus vacunas correspondientes.",
+        dialogo: "Me toca mi revisión y mis inyecciones de control médico...",
+        solucion: "Colocar Vacunas"
+      },
+      2: {
+        nombre: "Emma Valentini", emoji: "👧",
+        edad: "3 años", medidas: "Peso: 14.2 kg | Talla: 94 cm",
+        motivo: "Fiebre nocturna alta y malestar corporal.",
+        diag: "Rinofaringitis aguda. Se indica control térmico inmediato con antipirético.",
+        dialogo: "Me duele mi cabecita y tengo el cuerpo muy caliente...",
+        solucion: "Jarabe para la Fiebre"
+      },
+      3: {
+        nombre: "Mateo Ruiz", emoji: "👶",
+        edad: "8 meses", medidas: "Peso: 8.1 kg | Talla: 69 cm",
+        motivo: "Brotes y ronchas rojas ásperas en mejillas.",
+        diag: "Dermatitis atópica infantil. Aplicar tratamiento cutáneo emoliente.",
+        dialogo: "Me pican mucho mis cachetes colorados...",
+        solucion: "Crema Humectante"
+      },
+      4: {
+        nombre: "Sofía Mendoza", emoji: "👧",
+        edad: "5 años", medidas: "Peso: 18.0 kg | Talla: 108 cm",
+        motivo: "Dolor abdominal agudo tras comer dulces en exceso.",
+        diag: "Dispepsia transitoria (empacho). Administrar solución reguladora gástrica.",
+        dialogo: "Me duele mucho la pancita por comer golosinas...",
+        solucion: "Gotas para la Panza"
+      },
+      5: {
+        nombre: "Thiago Silva", emoji: "👦",
+        edad: "2 años", medidas: "Peso: 12.8 kg | Talla: 88 cm",
+        motivo: "Tos seca continua de sonido ronco y crupal por las noches.",
+        diag: "Laringitis aguda leve. Se receta jarabe especial para calmar la vía aérea.",
+        dialogo: "No puedo parar de toser fuerte por las noches...",
+        solucion: "Jarabe para la Tos"
+      },
+      6: {
+        nombre: "Valentina Vega", emoji: "👶",
+        edad: "11 meses", medidas: "Peso: 9.3 kg | Talla: 74 cm",
+        motivo: "Irritabilidad persistente y llanto por brote de primeros incisivos.",
+        diag: "Molestia por brote dentario. Aliviar la molestia con objeto frío masticable.",
+        dialogo: "Me duelen mis encías porque me están saliendo mis primeros dientes...",
+        solucion: "Mordedor Frío"
+      }
+    };
+
+    function abrirConsultorio() {
+      const puerta = document.getElementById('puerta');
+      const pasillo = document.getElementById('pasillo');
+      const consultorio = document.getElementById('consultorio');
+
+      puerta.classList.add('open');
+
+      setTimeout(() => {
+        pasillo.classList.add('zoom-in');
+      }, 600);
+
+      setTimeout(() => {
+        pasillo.classList.add('oculto');
+        consultorio.classList.remove('oculto');
+        
+        setTimeout(() => {
+          consultorio.classList.add('visible');
+        }, 50);
+      }, 1400); 
+    }
+
+    function verPendiente(numero) {
+      pacienteActualID = numero;
+      const paciente = datosPacientes[numero];
+      const modal = document.getElementById('modal-expediente');
+      
+      if (paciente) {
+        document.getElementById('exp-nombre').innerText = paciente.nombre;
+        document.getElementById('exp-edad').innerText = paciente.edad;
+        document.getElementById('exp-medidas').innerText = paciente.medidas;
+        document.getElementById('exp-motivo').innerText = paciente.motivo;
+        document.getElementById('exp-diag').innerText = paciente.diag;
+        
+        modal.style.opacity = '1';
+        modal.style.pointerEvents = 'auto';
+      }
+    }
+
+    function cerrarExpediente() {
+      const modal = document.getElementById('modal-expediente');
+      modal.style.opacity = '0';
+      modal.style.pointerEvents = 'none';
+    }
+
+    function irACamilla() {
+      cerrarExpediente();
+      const paciente = datosPacientes[pacienteActualID];
+      
+      document.getElementById('consultorio').classList.add('oculto');
+      document.getElementById('pantalla-camilla').classList.remove('oculto');
+      
+      document.getElementById('camilla-paciente-nombre').innerText = "Atendiendo a: " + paciente.nombre;
+      document.getElementById('emoji-paciente').innerText = paciente.emoji;
+      document.getElementById('burbuja-paciente').innerText = paciente.dialogo;
+      
+      document.getElementById('instruccion-botiquin').classList.remove('oculto');
+      document.getElementById('contenedor-botones').classList.remove('oculto');
+      document.getElementById('btn-regresar-pizarra').classList.add('oculto');
+      document.getElementById('boxel').classList.remove('oculto');
+    }
+
+    function aplicarTratamiento(nombreMedicina) {
+      const paciente = datosPacientes[pacienteActualID];
+      const burbuja = document.getElementById('burbuja-paciente');
+      const emoji = document.getElementById('emoji-paciente');
+
+      if (nombreMedicina === paciente.solucion) {
+        emoji.innerText = "✨" + paciente.emoji + "✨";
+        burbuja.innerText = "Me siento muy bien ahora. Muchas gracias Dra. Enyiel";
+        document.getElementById('instruccion-botiquin').classList.add('oculto');
+        document.getElementById('contenedor-botones').classList.add('oculto');
+        document.getElementById('btn-regresar-pizarra').classList.remove('oculto');
+        document.getElementById('boxel').classList.add('oculto');
+        
+        document.getElementById('hoja-' + pacienteActualID).classList.add('completado');
+      } else {
+        emoji.classList.add('shake-animation');
+        burbuja.innerText = "Eso no me ayudara con lo que tengo. 🤒";
+        
+        setTimeout(() => {
+          emoji.classList.remove('shake-animation');
+        }, 300);
+      }
+    }
+
+    function regresarAPizarra() {
+      document.getElementById('pantalla-camilla').classList.add('oculto');
+      document.getElementById('consultorio').classList.remove('oculto');
+      
+      const completados = document.querySelectorAll('.pending-sheet.completado').length;
+      
+      if (completados === 6) {
+        document.getElementById('burbuja-dra').innerText = "Muy bien, resolvimos todos los pendientes, ahora vayamos a jugar free con Jhire";
+      } else {
+        document.getElementById('burbuja-dra').innerText = "¡Excelente diagnóstico con el paciente anterior!";
+      }
+    }
+  </script>
+
+</body>
+</html>
