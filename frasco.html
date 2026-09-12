@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frasco de Mensajes</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lora:ital@0;1&display=swap');
+
+    :root {
+      --color-fondo: #0a0a0a;
+      --color-frasco: rgba(255, 255, 255, 0.15);
+      --color-brillo: rgba(255, 255, 255, 0.25);
+      --color-tapa: #d1d1d1;
+      --color-papel: #fdfcf0;
+    }
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      background-color: var(--color-fondo);
+      font-family: 'Lora', serif;
+      overflow: hidden;
+      padding-bottom: 120px;
+      box-sizing: border-box;
+    }
+    .notes-area {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 320px);
+      display: flex;
+      z-index: 5;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+    .paper-note {
+      position: absolute;
+      width: 260px;
+      max-height: 150px;
+      background: var(--color-papel);
+      padding: 20px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+      z-index: 6;
+      color: #2c2c2c;
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: center;
+      overflow-y: auto;
+      pointer-events: auto;
+      animation: floatUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
+    }
+    .jar-container {
+      position: relative;
+      width: 160px;
+      height: 220px;
+      cursor: pointer;
+      z-index: 100;
+      margin-top: 20px;
+    }
+    .jar-container.shake {
+      animation: shakeJar 0.4s ease-in-out;
+    }
+    .lid {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 20px;
+      background: var(--color-tapa);
+      border-radius: 4px 4px 2px 2px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      z-index: 100;
+    }
+    .jar-body {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 200px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), transparent), rgba(255, 255, 255, 0.03);
+      border: 2px solid var(--color-frasco);
+      border-radius: 15px 15px 35px 35px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.05);
+      z-index: 2;
+    }
+    .jar-body::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      width: 10px;
+      height: 150px;
+      background: linear-gradient(to bottom, var(--color-brillo), transparent);
+      border-radius: 10px;
+      opacity: 0.6;
+    }
+    .instruction {
+      color: rgba(255,255,255,0.4);
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin: 15px 0 0 0;
+      z-index: 101;
+      text-align: center;
+    }
+    @keyframes shakeJar {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(-4deg); }
+      40% { transform: rotate(4deg); }
+      60% { transform: rotate(-2deg); }
+      80% { transform: rotate(2deg); }
+    }
+
+    @keyframes floatUp {
+      0% {
+        top: 70vh;
+        left: 15%;
+        opacity: 0;
+        scale: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        top: 40%;
+        left: 20%;
+        opacity: 1;
+        scale: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="notes-area" id="contenedor-notas"></div>
+  <div class="jar-container" id="frasco" onclick="sacarMensaje()">
+    <div class="lid"></div>
+    <div class="jar-body"></div>
+  </div>
+  <p class="instruction">Toca el frasco para sacar notas</p>
+  <script>
+    const mensajes = [
+      "¿Como amaneciste hoy? Espero que con una sonrisa enorme <3",
+      "Estas bien hermosaaaa 😍",
+      "Te sentiras linda si te digo que cada que te veo me enamoras?",
+      "No importa a que hora leas esto, estoy pensando en ti ahora mismo ❤️",
+      "Jugamos fri fayer? Xd",
+      "Espero haberte sacado aunque sea una mini sonrisa en este momento ☺️",
+      "No olvides descansar bien y tomar agüita ",
+      "Siempre que me llamas me alegras el dia <3",
+      "Imaginate que tengamos un hijo y tengamos que decirle que nos conocimos por un emparejamiento random del fri, no se piensalo 🥰❤️",
+      "Ya andas sintiendo algo por mi? aunque sea algo poquito? :(",
+      "Guapa, bella, hermosa, diosa, preciosa, inefable mi niña 🥰",
+      "Te quiero yo, y tu a mi?",
+      "El sol debe sentir envidia del brillo que emanas <3",
+      "Y si te dijera que fueras mi pareja?",
+      "Estaras leyendo esto",
+      "Sera que piensas en mi cuando haces tus cosas?",
+      "Lo que sea, mientras sea contigo ❤️",
+      "Agradecido con la vida por ponerte en mi camino <3",
+      "Quiero todo contigo, asi sea dificil, si me sujetas superaremos todo..",
+      "No es manzana, tampoco uva, es usted que es toda una hermosura 😍",
+      "Te dejo esta nota para que no olvides que te quiero y me importas mucho ☺️",
+      "Me apena comentar que me gustas de mas...",
+      "No importa que tan pesado este mi dia, con solo un mensaje tuyo mejorará todo ❤️",
+      "Si te saco una sonrisa, ya habré ganado, porque tu sonrisa es la mas linda 😍",
+      "Y por si tienes dudas, solo me interesas tu ❤️",
+      "Me encanta tu personalidad",
+      "No es por enamorarte pero ya se freir huevito 😎❤️",
+      "No busco ser tu prioridad, porque tu prioridad deben ser tus metas, tu familia, pero si busco ser el que te acompañe en todo eso 🥰",
+      "Te voy a empezar a cobrar renta porque en mi mente siempre estas...",
+      "Cuidate si? si no con quien me voy a casar?",
+      "Me gustas ❤️",
+      "Si te digo princesa no es que yo sea cursi, solo quiero quererte, Enyi, no te asustes ❤️",
+      "Mi niña bonita, mi dulce princesa 🥰",
+      "No sere perfecto pero conmigo no te faltara cariño, atencion, lealtad y amor <3",
+      "Ya llegué a tu vida y desllegada no hay, ni modo ☺️",
+      "Y mi fondo de pantalla de tus ojitos para cuando?",
+      "Te defenderia de todo, hasta de una cucaracha voladora 😁",
+      "Mi mundo se volvio increible desde que llegaste a mi vida..",
+      "Cada vez que te tomes una foto, recuerda que aca estoy para que me la mandes, porque me encanta verte ❤️",
+      "Ya viste como estas? toda hermosa, chula preciosaaaaaa 🥰",
+      "Tienes interes en mi?",
+      "Hay algo que dudes de mi?",
+      "Como estas? aparte de guapa claro",
+      "Quiero que tus ojos me miren y que tus labios me besen para que nunca me olvides, dime ¿Que te parece?",
+      "Contigo me siento bien ☺️",
+      "Necesitas soltar algo? aca estoy para ti..",
+      "Cual indirecta? usted me encanta y me enloquece 🥰",
+      "Espero que estes teniendo un dia asi como tu, linda",
+      "Hay algo que te guste de mi?",
+      "Siempre quiero saber de ti, hasta el detalle mas pequeño ❤️"
+    ];
+  let zIndexCounter = 1;
+  const notasBloqueadas = {};
+  function sacarMensaje() {
+    const frasco = document.getElementById('frasco');
+    const contenedorNotas = document.getElementById('contenedor-notas');
+    if (contenedorNotas.children.length >= 10) { 
+      contenedorNotas.removeChild(contenedorNotas.firstElementChild);
+    }
+    frasco.classList.add('shake');
+    setTimeout(() => frasco.classList.remove('shake'), 400);
+    const indicesDisponibles = [];
+    for (let i = 0; i < mensajes.length; i++) {
+      if (!notasBloqueadas[i] || notasBloqueadas[i] <= 0) {
+        indicesDisponibles.push(i);
+      }
+    }
+    if (indicesDisponibles.length === 0) {
+      for (const clave in notasBloqueadas) {
+        delete notasBloqueadas[clave];
+      }
+      for (let i = 0; i < mensajes.length; i++) {
+        indicesDisponibles.push(i);
+      }
+    }
+    const indiceElegido = indicesDisponibles[Math.floor(Math.random() * indicesDisponibles.length)];
+    const fraseAleatoria = mensajes[indiceElegido];
+    for (const clave in notasBloqueadas) {
+      if (notasBloqueadas[clave] > 0) {
+        notasBloqueadas[clave]--;
+      }
+    }
+    notasBloqueadas[indiceElegido] = 50;
+    const nuevaNota = document.createElement('div');
+    nuevaNota.classList.add('paper-note');
+    nuevaNota.innerHTML = fraseAleatoria;
+    const rotacionAleatoria = Math.floor(Math.random() * 16) - 8;
+    const desplazarX = Math.floor(Math.random() * 20) - 10;
+    const desplazarY = Math.floor(Math.random() * 20) - 10;
+    nuevaNota.style.zIndex = zIndexCounter;
+    nuevaNota.style.transform = `translate(${desplazarX}px, ${desplazarY}px) rotate(${rotacionAleatoria}deg)`;
+    zIndexCounter++;
+    contenedorNotas.appendChild(nuevaNota);
+  }
+  </script>
+</body>
+</html>
