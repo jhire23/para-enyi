@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flores Amarillas Para Ti 🌼</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: linear-gradient(135deg, #fffde7 0%, #fff9c4 50%, #fff59d 100%);
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      margin: 0;
+      padding: 0;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      color: #5d4037;
+      box-sizing: border-box;
+    }
+
+    .petals-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .floating-petal {
+      position: absolute;
+      background: #ffee58;
+      border-radius: 150px 0 150px 0;
+      opacity: 0.6;
+      animation: float 10s infinite linear;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-10vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 40px 25px;
+      max-width: 550px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(251, 192, 45, 0.25);
+      border: 2px solid #fff59d;
+      position: relative;
+      z-index: 2;
+      min-height: 480px;
+    }
+
+    .welcome-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      flex: 1;
+      transition: all 0.5s ease;
+    }
+
+    .gift-icon {
+      font-size: 3.5rem;
+      margin-top: 100px;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.15);
+      }
+    }
+
+    .welcome-title {
+      color: #f57f17;
+      font-size: 1.7rem;
+      font-weight: bold;
+      margin-bottom: 40px;
+      margin-top: 50px;
+    }
+
+    .welcome-subtitle {
+      color: #8d6e63;
+      font-size: 1.1rem;
+      font-style: italic;
+      margin-bottom: 30px;
+      max-width: 340px;
+      line-height: 1.5;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, #fbc02d 0%, #f57f17 100%);
+      color: white;
+      border: none;
+      padding: 16px 40px;
+      font-size: 1.25rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(245, 127, 23, 0.35);
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .btn-start:hover {
+      background: linear-gradient(135deg, #f57f17 0%, #e65100 100%);
+      box-shadow: 0 14px 30px rgba(245, 127, 23, 0.45);
+      transform: scale(1.05);
+    }
+
+    .welcome-box.fade-out {
+      opacity: 0;
+      transform: scale(0.8);
+      pointer-events: none;
+      display: none;
+    }
+
+    .bouquet-container {
+      display: none;
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin: 0 auto;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .bouquet-container.active {
+      display: flex;
+    }
+
+    .flower-item {
+      position: absolute;
+      width: 130px;
+      height: 250px;
+      bottom: 0;
+      opacity: 0;
+      transform-origin: bottom center;
+      transform: scale(0) translateY(80px);
+      transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .flower-item.show {
+      opacity: 1;
+    }
+
+    #flower1.show {
+      transform: scale(0.95) rotate(-18deg) translateX(-2px);
+      z-index: 2;
+    }
+
+    #flower2.show {
+      transform: scale(1.05) rotate(-10deg) translateY(-15px);
+      z-index: 4;
+    }
+
+    #flower3.show {
+      transform: scale(0.95) rotate(18deg) translateX(2px);
+      z-index: 3;
+    }
+
+    #flower4.show {
+      transform: scale(0.88) rotate(8deg) translateY(1px);
+      z-index: 1;
+    }
+
+    #flower5.show {
+      transform: scale(1.2) rotate(15deg) translateY(-15px);
+      z-index: 4;
+    }
+
+    .sunflower-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 6px 10px rgba(245, 127, 23, 0.25));
+    }
+
+    .bouquet-ribbon {
+      position: absolute;
+      bottom: 20px;
+      width: 90px;
+      height: 65px;
+      z-index: 5;
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.6s ease;
+    }
+
+    .bouquet-ribbon.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .bottom-text {
+      margin-top: 25px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 1s ease;
+      max-width: 450px;
+    }
+
+    .bottom-text.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .bottom-text h2 {
+      color: #f57f17;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+
+    .bottom-text p {
+      color: #5d4037;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    footer {
+      margin-top: 15px;
+      font-size: 0.85rem;
+      color: #a1887f;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="petals-container" id="petals"></div>
+
+  <div class="card">
+    <div class="welcome-box" id="welcomeBox">
+      <div class="gift-icon">🎁</div>
+      <h1 class="welcome-title">Alguien dejó algo para ti</h1>
+      <p class="welcome-subtitle">Tienes un detalle especial sin abrir 👀</p>
+      <button class="btn-start" onclick="revelarRamo()">
+        Abrir sorpresa ✨
+      </button>
+    </div>
+
+    <div class="bouquet-container" id="bouquet">
+      <div class="flower-item" id="flower1">
+        <svg class="sunflower-svg" viewBox="0 0 200 300">
+          <path d="M100,120 Q95,200 100,300" stroke="#4caf50" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="M100,200 Q65,185 50,165 Q75,160 100,200" fill="#4caf50"/>
+          <g fill="#ffeb3b" stroke="#fbc02d" stroke-width="1.5">
+            <ellipse cx="100" cy="40" rx="12" ry="32"/>
+            <ellipse cx="100" cy="120" rx="12" ry="32"/>
+            <ellipse cx="60" cy="80" rx="32" ry="12"/>
+            <ellipse cx="140" cy="80" rx="32" ry="12"/>
+            <ellipse cx="72" cy="52" rx="12" ry="32" transform="rotate(-45 72 52)"/>
+            <ellipse cx="128" cy="108" rx="12" ry="32" transform="rotate(-45 128 108)"/>
+            <ellipse cx="72" cy="108" rx="12" ry="32" transform="rotate(45 72 108)"/>
+            <ellipse cx="128" cy="52" rx="12" ry="32" transform="rotate(45 128 52)"/>
+          </g>
+          <circle cx="100" cy="80" r="30" fill="#5d4037"/>
+          <circle cx="100" cy="80" r="25" fill="#3e2723" stroke="#8d6e63" stroke-width="2" stroke-dasharray="4 2"/>
+        </svg>
+      </div>
+
+      <div class="flower-item" id="flower2">
+        <svg class="sunflower-svg" viewBox="0 0 200 300">
+          <path d="M100,120 Q105,200 100,300" stroke="#43a047" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="M100,180 Q135,165 150,145 Q125,140 100,180" fill="#43a047"/>
+          <g fill="#ffee58" stroke="#fbc02d" stroke-width="1.5">
+            <ellipse cx="100" cy="40" rx="12" ry="32"/>
+            <ellipse cx="100" cy="120" rx="12" ry="32"/>
+            <ellipse cx="60" cy="80" rx="32" ry="12"/>
+            <ellipse cx="140" cy="80" rx="32" ry="12"/>
+            <ellipse cx="72" cy="52" rx="12" ry="32" transform="rotate(-45 72 52)"/>
+            <ellipse cx="128" cy="108" rx="12" ry="32" transform="rotate(-45 128 108)"/>
+            <ellipse cx="72" cy="108" rx="12" ry="32" transform="rotate(45 72 108)"/>
+            <ellipse cx="128" cy="52" rx="12" ry="32" transform="rotate(45 128 52)"/>
+          </g>
+          <circle cx="100" cy="80" r="30" fill="#4e342e"/>
+          <circle cx="100" cy="80" r="25" fill="#3e2723" stroke="#a1887f" stroke-width="2" stroke-dasharray="4 2"/>
+        </svg>
+      </div>
+
+      <div class="flower-item" id="flower3">
+        <svg class="sunflower-svg" viewBox="0 0 200 300">
+          <path d="M100,120 Q95,200 100,300" stroke="#4caf50" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="M100,210 Q65,190 50,170 Q75,165 100,210" fill="#4caf50"/>
+          <g fill="#fdd835" stroke="#f57f17" stroke-width="1.5">
+            <ellipse cx="100" cy="40" rx="12" ry="32"/>
+            <ellipse cx="100" cy="120" rx="12" ry="32"/>
+            <ellipse cx="60" cy="80" rx="32" ry="12"/>
+            <ellipse cx="140" cy="80" rx="32" ry="12"/>
+            <ellipse cx="72" cy="52" rx="12" ry="32" transform="rotate(-45 72 52)"/>
+            <ellipse cx="128" cy="108" rx="12" ry="32" transform="rotate(-45 128 108)"/>
+            <ellipse cx="72" cy="108" rx="12" ry="32" transform="rotate(45 72 108)"/>
+            <ellipse cx="128" cy="52" rx="12" ry="32" transform="rotate(45 128 52)"/>
+          </g>
+          <circle cx="100" cy="80" r="30" fill="#5d4037"/>
+          <circle cx="100" cy="80" r="25" fill="#3e2723" stroke="#8d6e63" stroke-width="2" stroke-dasharray="4 2"/>
+        </svg>
+      </div>
+
+      <div class="flower-item" id="flower4">
+        <svg class="sunflower-svg" viewBox="0 0 200 300">
+          <path d="M100,120 Q100,200 100,300" stroke="#388e3c" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <g fill="#ffeb3b" stroke="#fbc02d" stroke-width="1.5">
+            <ellipse cx="100" cy="40" rx="12" ry="32"/>
+            <ellipse cx="100" cy="120" rx="12" ry="32"/>
+            <ellipse cx="60" cy="80" rx="32" ry="12"/>
+            <ellipse cx="140" cy="80" rx="32" ry="12"/>
+            <ellipse cx="72" cy="52" rx="12" ry="32" transform="rotate(-45 72 52)"/>
+            <ellipse cx="128" cy="108" rx="12" ry="32" transform="rotate(-45 128 108)"/>
+            <ellipse cx="72" cy="108" rx="12" ry="32" transform="rotate(45 72 108)"/>
+            <ellipse cx="128" cy="52" rx="12" ry="32" transform="rotate(45 128 52)"/>
+          </g>
+          <circle cx="100" cy="80" r="30" fill="#4e342e"/>
+          <circle cx="100" cy="80" r="25" fill="#3e2723" stroke="#a1887f" stroke-width="2" stroke-dasharray="4 2"/>
+        </svg>
+      </div>
+
+      <div class="flower-item" id="flower5">
+        <svg class="sunflower-svg" viewBox="0 0 200 300">
+          <path d="M100,120 Q105,200 100,300" stroke="#43a047" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="M100,180 Q135,165 150,145 Q125,140 100,180" fill="#43a047"/>
+          <g fill="#ffee58" stroke="#fbc02d" stroke-width="1.5">
+            <ellipse cx="100" cy="40" rx="12" ry="32"/>
+            <ellipse cx="100" cy="120" rx="12" ry="32"/>
+            <ellipse cx="60" cy="80" rx="32" ry="12"/>
+            <ellipse cx="140" cy="80" rx="32" ry="12"/>
+            <ellipse cx="72" cy="52" rx="12" ry="32" transform="rotate(-45 72 52)"/>
+            <ellipse cx="128" cy="108" rx="12" ry="32" transform="rotate(-45 128 108)"/>
+            <ellipse cx="72" cy="108" rx="12" ry="32" transform="rotate(45 72 108)"/>
+            <ellipse cx="128" cy="52" rx="12" ry="32" transform="rotate(45 128 52)"/>
+          </g>
+          <circle cx="100" cy="80" r="30" fill="#4e342e"/>
+          <circle cx="100" cy="80" r="25" fill="#3e2723" stroke="#a1887f" stroke-width="2" stroke-dasharray="4 2"/>
+        </svg>
+      </div>
+
+      <svg class="bouquet-ribbon" id="ribbon" viewBox="0 0 100 80">
+        <path d="M30,30 C10,10 0,40 30,50 C40,53 50,45 50,40 C50,45 60,53 70,50 C100,40 90,10 70,30 C60,40 50,35 50,30 C50,35 40,40 30,30 Z" fill="#e65100"/>
+        <circle cx="50" cy="38" r="8" fill="#f57f17"/>
+        <path d="M45,44 L35,75 L48,65 L52,65 L65,75 L55,44 Z" fill="#e65100"/>
+      </svg>
+    </div>
+
+    <div class="bottom-text" id="bottomText">
+      <h2>Tus flores amarillas</h2>
+      <h2>🌻❤️</h2>
+      <p>Se que estamos lejos pero este ramo es para ti, espero que te traiga mucha alegría y mantenga una sonrisa en tu rostro 😊</p>
+      <footer>Te quiero mi Enyi</footer>
+    </div>
+  </div>
+
+  <script>
+    const petalsContainer = document.getElementById('petals');
+    const petalCount = 15;
+
+    for (let i = 0; i < petalCount; i++) {
+      const petal = document.createElement('div');
+      petal.classList.add('floating-petal');
+
+      const size = Math.random() * 15 + 10;
+      petal.style.width = `${size}px`;
+      petal.style.height = `${size * 1.5}px`;
+      petal.style.left = `${Math.random() * 100}%`;
+      petal.style.animationDuration = `${Math.random() * 5 + 7}s`;
+      petal.style.animationDelay = `${Math.random() * 5}s`;
+
+      petalsContainer.appendChild(petal);
+    }
+
+    function revelarRamo() {
+      const welcomeBox = document.getElementById('welcomeBox');
+      const bouquet = document.getElementById('bouquet');
+      const ribbon = document.getElementById('ribbon');
+      const bottomText = document.getElementById('bottomText');
+
+      welcomeBox.classList.add('fade-out');
+
+      setTimeout(() => {
+        bouquet.classList.add('active');
+
+        const flowers = [
+          document.getElementById('flower4'),
+          document.getElementById('flower1'),
+          document.getElementById('flower3'),
+          document.getElementById('flower2'),
+          document.getElementById('flower5')
+        ];
+
+        flowers.forEach((flower, index) => {
+          setTimeout(() => {
+            flower.classList.add('show');
+          }, index * 250);
+        });
+
+        setTimeout(() => {
+          ribbon.classList.add('show');
+        }, flowers.length * 250);
+
+        setTimeout(() => {
+          bottomText.classList.add('show');
+        }, flowers.length * 250 + 300);
+
+      }, 300);
+    }
+  </script>
+</body>
+</html>
